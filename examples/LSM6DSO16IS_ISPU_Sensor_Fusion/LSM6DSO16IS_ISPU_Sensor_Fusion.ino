@@ -11,6 +11,12 @@
                           opensource.org/licenses/BSD-3-Clause
  *******************************************************************************
 */
+
+/*
+ * You can display the quaternion values with a 3D model connecting for example to this link:
+ * https://adafruit.github.io/Adafruit_WebSerial_3DModelViewer/
+ */
+
 // Includes
 #include "LSM6DSO16ISSensor.h"
 #include "sensor_fusion.h"
@@ -27,8 +33,8 @@ int32_t TotalNumberOfLine;
 void INT1Event_cb();
 
 union data {
-    uint8_t raw_data[16];
-    float_t values[4];
+  uint8_t raw_data[16];
+  float_t values[4];
 };
 
 void setup()
@@ -47,7 +53,7 @@ void setup()
   sensor.Enable_X();
   sensor.Enable_G();
 
-  // Feed the program to ISPU 
+  // Feed the program to ISPU
   ProgramPointer = (ucf_line_ext_t *)ispu_conf;
   TotalNumberOfLine = sizeof(ispu_conf) / sizeof(ucf_line_ext_t);
   Serial.println("LSM6DSO16IS ISPU Sensor Fusion");
@@ -55,20 +61,19 @@ void setup()
   Serial.println(TotalNumberOfLine);
 
   for (LineCounter = 0; LineCounter < TotalNumberOfLine; LineCounter++) {
-    if(ProgramPointer[LineCounter].op == MEMS_UCF_OP_WRITE){
-  		if (sensor.Write_Reg(ProgramPointer[LineCounter].address, ProgramPointer[LineCounter].data)) {
-  		  Serial.print("Error loading the Program to LSM6DSO16ISSensor at line: ");
-  		  Serial.println(LineCounter);
-  		  while (1) {
-    			// Led blinking.
-    			digitalWrite(LED_BUILTIN, HIGH);
-    			delay(250);
-    			digitalWrite(LED_BUILTIN, LOW);
-    			delay(250);
-  		  }
-		  }
-	  }
-    else if(ProgramPointer[LineCounter].op == MEMS_UCF_OP_DELAY){
+    if (ProgramPointer[LineCounter].op == MEMS_UCF_OP_WRITE) {
+      if (sensor.Write_Reg(ProgramPointer[LineCounter].address, ProgramPointer[LineCounter].data)) {
+        Serial.print("Error loading the Program to LSM6DSO16ISSensor at line: ");
+        Serial.println(LineCounter);
+        while (1) {
+          // Led blinking.
+          digitalWrite(LED_BUILTIN, HIGH);
+          delay(250);
+          digitalWrite(LED_BUILTIN, LOW);
+          delay(250);
+        }
+      }
+    } else if (ProgramPointer[LineCounter].op == MEMS_UCF_OP_DELAY) {
       delay(ProgramPointer[LineCounter].data);
     }
   }
@@ -87,9 +92,9 @@ void loop()
     mems_event = 0;
     sensor.Get_ISPU_Status(&ispu_status);
     // Check if the ISPU event is from the algo00.
-    if(ispu_status.ia_ispu_0) {
+    if (ispu_status.ia_ispu_0) {
       // Read quaternions and print them.
-      sensor.Read_ISPU_Output(LSM6DSO16IS_ISPU_DOUT_00_L ,&quaternions.raw_data[0],16);     
+      sensor.Read_ISPU_Output(LSM6DSO16IS_ISPU_DOUT_00_L, &quaternions.raw_data[0], 16);
       Serial.print("Quaternion: ");
       Serial.print(quaternions.values[3], 4);
       Serial.print(", ");
@@ -97,8 +102,8 @@ void loop()
       Serial.print(", ");
       Serial.print(quaternions.values[0], 4);
       Serial.print(", ");
-      Serial.println(quaternions.values[2], 4); 
-    } 
+      Serial.println(quaternions.values[2], 4);
+    }
   }
 }
 

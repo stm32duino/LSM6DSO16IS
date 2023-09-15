@@ -43,7 +43,7 @@ void setup()
   sensor.begin();
   sensor.Enable_X();
 
-  // Feed the program to ISPU 
+  // Feed the program to ISPU
   ProgramPointer = (ucf_line_ext_t *)ispu_conf;
   TotalNumberOfLine = sizeof(ispu_conf) / sizeof(ucf_line_ext_t);
   Serial.println("LSM6DSO16IS ISPU Tap");
@@ -51,20 +51,19 @@ void setup()
   Serial.println(TotalNumberOfLine);
 
   for (LineCounter = 0; LineCounter < TotalNumberOfLine; LineCounter++) {
-    if(ProgramPointer[LineCounter].op == MEMS_UCF_OP_WRITE){
-  		if (sensor.Write_Reg(ProgramPointer[LineCounter].address, ProgramPointer[LineCounter].data)) {
-  		  Serial.print("Error loading the Program to LSM6DSO16ISSensor at line: ");
-  		  Serial.println(LineCounter);
-  		  while (1) {
-    			// Led blinking.
-    			digitalWrite(LED_BUILTIN, HIGH);
-    			delay(250);
-    			digitalWrite(LED_BUILTIN, LOW);
-    			delay(250);
-  		  }
-		  }
-	  }
-    else if(ProgramPointer[LineCounter].op == MEMS_UCF_OP_DELAY){
+    if (ProgramPointer[LineCounter].op == MEMS_UCF_OP_WRITE) {
+      if (sensor.Write_Reg(ProgramPointer[LineCounter].address, ProgramPointer[LineCounter].data)) {
+        Serial.print("Error loading the Program to LSM6DSO16ISSensor at line: ");
+        Serial.println(LineCounter);
+        while (1) {
+          // Led blinking.
+          digitalWrite(LED_BUILTIN, HIGH);
+          delay(250);
+          digitalWrite(LED_BUILTIN, LOW);
+          delay(250);
+        }
+      }
+    } else if (ProgramPointer[LineCounter].op == MEMS_UCF_OP_DELAY) {
       delay(ProgramPointer[LineCounter].data);
     }
   }
@@ -86,9 +85,9 @@ void loop()
     mems_event = 0;
     sensor.Get_ISPU_Status(&ispu_status);
     // Check if the ISPU event is from the algo00.
-    if(ispu_status.ia_ispu_0) {
+    if (ispu_status.ia_ispu_0) {
       //Get the tap event as uint8_t mapped starting from ISPU_DOUT_06_L and print it.
-      sensor.Read_ISPU_Output(LSM6DSO16IS_ISPU_DOUT_06_L,&data,1);
+      sensor.Read_ISPU_Output(LSM6DSO16IS_ISPU_DOUT_06_L, &data, 1);
       printTapStatus(data);
     }
   }
