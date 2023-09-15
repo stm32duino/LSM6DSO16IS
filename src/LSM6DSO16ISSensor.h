@@ -42,15 +42,37 @@ typedef enum {
 } LSM6DSO16IS_SensorIntPin_t;
 
 typedef struct {
-  unsigned int FreeFallStatus : 1;
-  unsigned int TapStatus : 1;
-  unsigned int DoubleTapStatus : 1;
-  unsigned int WakeUpStatus : 1;
-  unsigned int StepStatus : 1;
-  unsigned int TiltStatus : 1;
-  unsigned int D6DOrientationStatus : 1;
-  unsigned int SleepStatus : 1;
-} LSM6DSO16IS_Event_Status_t;
+  unsigned int ia_ispu_0 : 1;
+  unsigned int ia_ispu_1 : 1;
+  unsigned int ia_ispu_2 : 1;
+  unsigned int ia_ispu_3 : 1;
+  unsigned int ia_ispu_4 : 1;
+  unsigned int ia_ispu_5 : 1;
+  unsigned int ia_ispu_6 : 1;
+  unsigned int ia_ispu_7 : 1;
+  unsigned int ia_ispu_8 : 1;
+  unsigned int ia_ispu_9 : 1;
+  unsigned int ia_ispu_10 : 1;
+  unsigned int ia_ispu_11 : 1;
+  unsigned int ia_ispu_12 : 1;
+  unsigned int ia_ispu_13 : 1;
+  unsigned int ia_ispu_14 : 1;
+  unsigned int ia_ispu_15 : 1;
+  unsigned int ia_ispu_16 : 1;
+  unsigned int ia_ispu_17 : 1;
+  unsigned int ia_ispu_18 : 1;
+  unsigned int ia_ispu_19 : 1;
+  unsigned int ia_ispu_20 : 1;
+  unsigned int ia_ispu_21 : 1;
+  unsigned int ia_ispu_22 : 1;
+  unsigned int ia_ispu_23 : 1;
+  unsigned int ia_ispu_24 : 1;
+  unsigned int ia_ispu_25 : 1;
+  unsigned int ia_ispu_26 : 1;
+  unsigned int ia_ispu_27 : 1;
+  unsigned int ia_ispu_28 : 1;
+  unsigned int ia_ispu_29 : 1;
+} LSM6DSO16IS_ISPU_Status_t;
 
 /* Defines -------------------------------------------------------------------*/
 
@@ -82,13 +104,12 @@ class LSM6DSO16ISSensor {
 
     LSM6DSO16ISStatusTypeDef begin(void);
     LSM6DSO16ISStatusTypeDef end(void);
-
     LSM6DSO16ISStatusTypeDef ReadID(uint8_t *Id);
     LSM6DSO16ISStatusTypeDef Read_Reg(uint8_t reg, uint8_t *Data);
-    LSM6DSO16ISStatusTypeDef Read_Multi(uint8_t reg, uint8_t *Data, uint8_t len);
+    LSM6DSO16ISStatusTypeDef Read_ISPU_Output(uint8_t reg, uint8_t *Data, uint8_t len);
     LSM6DSO16ISStatusTypeDef Write_Reg(uint8_t reg, uint8_t Data);
     LSM6DSO16ISStatusTypeDef Set_Interrupt_Latch(uint8_t Status);
-
+    LSM6DSO16ISStatusTypeDef Get_ISPU_Status(LSM6DSO16IS_ISPU_Status_t *Status);
     LSM6DSO16ISStatusTypeDef Enable_X(void);
     LSM6DSO16ISStatusTypeDef Disable_X(void);
     LSM6DSO16ISStatusTypeDef Get_X_Sensitivity(float *Sensitivity);
@@ -102,7 +123,6 @@ class LSM6DSO16ISSensor {
     LSM6DSO16ISStatusTypeDef Set_X_INT1_DRDY(uint8_t Val);
     LSM6DSO16ISStatusTypeDef Get_X_Init_Status(uint8_t *Status);
     LSM6DSO16ISStatusTypeDef Get_X_DRDY_Status(uint8_t *Status);
-
     LSM6DSO16ISStatusTypeDef Enable_G(void);
     LSM6DSO16ISStatusTypeDef Disable_G(void);
     LSM6DSO16ISStatusTypeDef Get_G_Sensitivity(float *Sensitivity);
@@ -116,74 +136,7 @@ class LSM6DSO16ISSensor {
     LSM6DSO16ISStatusTypeDef Set_G_INT1_DRDY(uint8_t Val);
     LSM6DSO16ISStatusTypeDef Get_G_Init_Status(uint8_t *Status);
     LSM6DSO16ISStatusTypeDef Get_G_DRDY_Status(uint8_t *Status);
-
-    LSM6DSO16ISStatusTypeDef Enable_Free_Fall_Detection(LSM6DSO16IS_SensorIntPin_t IntPin);
-    LSM6DSO16ISStatusTypeDef Disable_Free_Fall_Detection(void);
-    LSM6DSO16ISStatusTypeDef Set_Free_Fall_Threshold(uint8_t Threshold);
-    LSM6DSO16ISStatusTypeDef Set_Free_Fall_Duration(uint8_t Duration);
-
-    LSM6DSO16ISStatusTypeDef Enable_Pedometer(void);
-    LSM6DSO16ISStatusTypeDef Disable_Pedometer(void);
-    LSM6DSO16ISStatusTypeDef Get_Step_Count(uint16_t *StepCount);
-    LSM6DSO16ISStatusTypeDef Enable_Step_Counter_Reset(void);
-    LSM6DSO16ISStatusTypeDef Disable_Step_Counter_Reset(void);
-    LSM6DSO16ISStatusTypeDef Set_Pedometer_Threshold(uint8_t Threshold);
-
-    LSM6DSO16ISStatusTypeDef Enable_Tilt_Detection(LSM6DSO16IS_SensorIntPin_t IntPin);
-    LSM6DSO16ISStatusTypeDef Disable_Tilt_Detection(void);
-
-    LSM6DSO16ISStatusTypeDef Enable_Wake_Up_Detection(LSM6DSO16IS_SensorIntPin_t IntPin);
-    LSM6DSO16ISStatusTypeDef Disable_Wake_Up_Detection(void);
-    LSM6DSO16ISStatusTypeDef Set_Wake_Up_Threshold(uint8_t Threshold);
-    LSM6DSO16ISStatusTypeDef Set_Wake_Up_Duration(uint8_t Duration);
-
-    LSM6DSO16ISStatusTypeDef Enable_Inactivity_Detection(LSM6DSO16IS_SensorIntPin_t IntPin);
-    LSM6DSO16ISStatusTypeDef Disable_Inactivity_Detection(void);
-    LSM6DSO16ISStatusTypeDef Set_Sleep_Duration(uint8_t Duration);
-
-    LSM6DSO16ISStatusTypeDef Enable_Single_Tap_Detection(LSM6DSO16IS_SensorIntPin_t IntPin);
-    LSM6DSO16ISStatusTypeDef Disable_Single_Tap_Detection(void);
-    LSM6DSO16ISStatusTypeDef Enable_Double_Tap_Detection(LSM6DSO16IS_SensorIntPin_t IntPin);
-    LSM6DSO16ISStatusTypeDef Disable_Double_Tap_Detection(void);
-    LSM6DSO16ISStatusTypeDef Set_Tap_Threshold(uint8_t Threshold);
-    LSM6DSO16ISStatusTypeDef Set_Tap_Shock_Time(uint8_t Time);
-    LSM6DSO16ISStatusTypeDef Set_Tap_Quiet_Time(uint8_t Time);
-    LSM6DSO16ISStatusTypeDef Set_Tap_Duration_Time(uint8_t Time);
-
-    LSM6DSO16ISStatusTypeDef Enable_6D_Orientation(LSM6DSO16IS_SensorIntPin_t IntPin);
-    LSM6DSO16ISStatusTypeDef Disable_6D_Orientation(void);
-    LSM6DSO16ISStatusTypeDef Set_6D_Orientation_Threshold(uint8_t Threshold);
-    LSM6DSO16ISStatusTypeDef Get_6D_Orientation_XL(uint8_t *XLow);
-    LSM6DSO16ISStatusTypeDef Get_6D_Orientation_XH(uint8_t *XHigh);
-    LSM6DSO16ISStatusTypeDef Get_6D_Orientation_YL(uint8_t *YLow);
-    LSM6DSO16ISStatusTypeDef Get_6D_Orientation_YH(uint8_t *YHigh);
-    LSM6DSO16ISStatusTypeDef Get_6D_Orientation_ZL(uint8_t *ZLow);
-    LSM6DSO16ISStatusTypeDef Get_6D_Orientation_ZH(uint8_t *ZHigh);
-
-    LSM6DSO16ISStatusTypeDef Get_Event_Status(LSM6DSO16IS_Event_Status_t *Status);
-    LSM6DSO16ISStatusTypeDef Set_SelfTest(uint8_t Val);
-    LSM6DSO16ISStatusTypeDef Get_DRDY_Status(uint8_t *Status);
-    LSM6DSO16ISStatusTypeDef Get_Init_Status(uint8_t *Status);
-    LSM6DSO16ISStatusTypeDef Set_INT1_DRDY(uint8_t Val);
-
-
     LSM6DSO16ISStatusTypeDef Set_DRDY_Mode(uint8_t Val);
-
-    LSM6DSO16ISStatusTypeDef Get_FIFO_Num_Samples(uint16_t *NumSamples);
-    LSM6DSO16ISStatusTypeDef Get_FIFO_Full_Status(uint8_t *Status);
-    LSM6DSO16ISStatusTypeDef Set_FIFO_ODR_Value(float Odr);
-    LSM6DSO16ISStatusTypeDef Set_FIFO_INT1_FIFO_Full(uint8_t Status);
-    LSM6DSO16ISStatusTypeDef Set_FIFO_Watermark_Level(uint16_t Watermark);
-    LSM6DSO16ISStatusTypeDef Set_FIFO_Stop_On_Fth(uint8_t Status);
-    LSM6DSO16ISStatusTypeDef Set_FIFO_Mode(uint8_t Mode);
-    LSM6DSO16ISStatusTypeDef Get_FIFO_Pattern(uint16_t *Pattern);
-    LSM6DSO16ISStatusTypeDef Get_FIFO_Data(uint8_t *Data);
-    LSM6DSO16ISStatusTypeDef Get_FIFO_Empty_Status(uint8_t *Status);
-    LSM6DSO16ISStatusTypeDef Get_FIFO_Overrun_Status(uint8_t *Status);
-    LSM6DSO16ISStatusTypeDef Set_FIFO_Decimation(uint8_t Decimation);
-    LSM6DSO16ISStatusTypeDef Get_FIFO_X_Axis(int32_t *Acceleration);
-    LSM6DSO16ISStatusTypeDef Set_FIFO_G_Decimation(uint8_t Decimation);
-    LSM6DSO16ISStatusTypeDef Get_FIFO_G_Axis(int32_t *AngularVelocity);
     /**
      * @brief Utility function to read data.
      * @param  pBuffer: pointer to data to be read.

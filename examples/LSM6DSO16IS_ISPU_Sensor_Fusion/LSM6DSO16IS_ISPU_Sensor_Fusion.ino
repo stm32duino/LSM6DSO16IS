@@ -18,7 +18,7 @@
 #define INT_1 A5
 
 //Interrupts.
-volatile int sf_event = 0;
+volatile int mems_event = 0;
 
 LSM6DSO16ISSensor sensor(&Wire);
 ucf_line_ext_t *ProgramPointer;
@@ -27,8 +27,8 @@ int32_t TotalNumberOfLine;
 void INT1Event_cb();
 
 union data {
-    uint8_t bytes[4];
-    float_t values;
+    uint8_t raw_data[16];
+    float_t values[4];
 };
 
 void setup()
@@ -72,44 +72,37 @@ void setup()
       delay(ProgramPointer[LineCounter].data);
     }
   }
-
   Serial.println("Program loaded inside the LSM6DSO16IS ISPU");
-
   //Interrupts.
   pinMode(INT_1, INPUT);
   attachInterrupt(INT_1, INT1Event_cb, RISING);
-  
-  //Enable the access to ISPU interaction registers
-  sensor.Write_Reg(LSM6DSO16IS_FUNC_CFG_ACCESS,0x80);
-
 }
 
 void loop()
 {
   union data quaternions;
-  //When the quaternion for the new sample is computed and available in the output registers an interrupt is generated
-  if (sf_event) {
-    sf_event = 0;
-    Serial.print("Quaternion: ");
-    //Get quaternion scalar component as float mapped starting from ISPU_DOUT_06_L (10h) and print it
-    sensor.Read_Multi(LSM6DSO16IS_ISPU_DOUT_06_L ,&quaternions.bytes[0],4);
-    Serial.print(quaternions.values, 4);
-    Serial.print(", ");
-    //Get quaternion y-axis as float mapped starting from ISPU_DOUT_02_L (10h) and print it
-    sensor.Read_Multi(LSM6DSO16IS_ISPU_DOUT_02_L ,&quaternions.bytes[0],4);
-    Serial.print(-quaternions.values, 4);
-    Serial.print(", ");
-    //Get quaternion x-axis as float mapped starting from ISPU_DOUT_00_L (10h) and print it
-    sensor.Read_Multi(LSM6DSO16IS_ISPU_DOUT_00_L ,&quaternions.bytes[0],4);
-    Serial.print(quaternions.values, 4);
-    Serial.print(", ");
-    //Get quaternion z-axis as float mapped starting from ISPU_DOUT_04_L (10h) and print it
-    sensor.Read_Multi(LSM6DSO16IS_ISPU_DOUT_04_L ,&quaternions.bytes[0],4);
-    Serial.println(quaternions.values, 4);
+  // When the quaternion for the new sample is computed and available in the output registers an interrupt is generated.
+  if (mems_event) {
+    LSM6DSO16IS_ISPU_Status_t ispu_status;
+    mems_event = 0;
+    sensor.Get_ISPU_Status(&ispu_status);
+    // Check if the ISPU event is from the algo00.
+    if(ispu_status.ia_ispu_0) {
+      // Read quaternions and print them.
+      sensor.Read_ISPU_Output(LSM6DSO16IS_ISPU_DOUT_00_L ,&quaternions.raw_data[0],16);     
+      Serial.print("Quaternion: ");
+      Serial.print(quaternions.values[3], 4);
+      Serial.print(", ");
+      Serial.print(-quaternions.values[1], 4);
+      Serial.print(", ");
+      Serial.print(quaternions.values[0], 4);
+      Serial.print(", ");
+      Serial.println(quaternions.values[2], 4); 
+    } 
   }
 }
 
 void INT1Event_cb()
 {
-  sf_event = 1;
+  mems_event = 1;
 }

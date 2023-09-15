@@ -789,20 +789,53 @@ LSM6DSO16ISStatusTypeDef LSM6DSO16ISSensor::Read_Reg(uint8_t Reg, uint8_t *Data)
 }
 
 /**
-  * @brief  Get the LSM6DSO16IS register value
+ * @brief  Get the status of all ISPU events
+ * @param  Status the status of all ISPU events
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSO16ISStatusTypeDef LSM6DSO16ISSensor::Get_ISPU_Status(LSM6DSO16IS_ISPU_Status_t *Status)
+{
+  LSM6DSO16ISStatusTypeDef ret = LSM6DSO16IS_STATUS_OK;
+
+  union {
+    uint32_t val;
+    LSM6DSO16IS_ISPU_Status_t status;
+  } ispu_status;
+
+  if (lsm6dso16is_ia_ispu_get(&reg_ctx, &ispu_status.val) != LSM6DSO16IS_STATUS_OK) {
+    ret = LSM6DSO16IS_STATUS_ERROR;
+  }
+
+  *Status = ispu_status.status;
+  return ret;
+}
+
+
+/**
+  * @brief  Get the LSM6DSO16IS ISPU Output
   * @param  Reg address where to start reading
   * @param  len number of registers to read
   * @param  Data pointer where the value is written
   * @retval 0 in case of success, an error code otherwise
   */
-LSM6DSO16ISStatusTypeDef LSM6DSO16ISSensor::Read_Multi(uint8_t Reg, uint8_t *Data, uint8_t len)
+LSM6DSO16ISStatusTypeDef LSM6DSO16ISSensor::Read_ISPU_Output(uint8_t Reg, uint8_t *Data, uint8_t len)
 {
   LSM6DSO16ISStatusTypeDef ret = LSM6DSO16IS_STATUS_OK;
-
+  //Check that register to read is an ISPU Output register
+  if (Reg < LSM6DSO16IS_ISPU_DOUT_00_L || Reg > LSM6DSO16IS_ISPU_DOUT_31_H) {
+    return LSM6DSO16IS_STATUS_ERROR;
+  }
+  //Enable the access to the ISPU interaction registers
+  if (lsm6dso16is_mem_bank_set(&reg_ctx, LSM6DSO16IS_ISPU_MEM_BANK) != LSM6DSO16IS_STATUS_OK) {
+    ret = LSM6DSO16IS_STATUS_ERROR;
+  }
   if (lsm6dso16is_read_reg(&reg_ctx, Reg, Data, len) != LSM6DSO16IS_STATUS_OK) {
     ret = LSM6DSO16IS_STATUS_ERROR;
   }
-
+  //Disable the access to the ISPU interaction registers
+  if (lsm6dso16is_mem_bank_set(&reg_ctx, LSM6DSO16IS_MAIN_MEM_BANK) != LSM6DSO16IS_STATUS_OK) {
+    ret = LSM6DSO16IS_STATUS_ERROR;
+  }
   return ret;
 }
 

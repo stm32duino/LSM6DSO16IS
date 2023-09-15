@@ -18,7 +18,7 @@
 #define INT_1 A5
 
 //Interrupts.
-volatile int tap_event = 0;
+volatile int mems_event = 0;
 
 LSM6DSO16ISSensor sensor(&Wire);
 
@@ -74,26 +74,29 @@ void setup()
   //Interrupts.
   pinMode(INT_1, INPUT);
   attachInterrupt(INT_1, INT1Event_cb, RISING);
-  //Enable the access to the ISPU interaction registers
-  sensor.Write_Reg(LSM6DSO16IS_FUNC_CFG_ACCESS,0x80);
 
 }
 
 void loop()
 {
-  uint8_t data;
-  //When the tap evet for the new sample is computed and available in the output registers an interrupt is generated
-  if (tap_event) {
-    tap_event = 0;
-    //Get the tap event as uint8_t mapped starting from ISPU_DOUT_06_L and print it.
-    sensor.Read_Reg(LSM6DSO16IS_ISPU_DOUT_06_L,&data);
-    printTapStatus(data);
+  // When the tap event for the new sample is computed and available in the output registers an interrupt is generated.
+  if (mems_event) {
+    uint8_t data;
+    LSM6DSO16IS_ISPU_Status_t ispu_status;
+    mems_event = 0;
+    sensor.Get_ISPU_Status(&ispu_status);
+    // Check if the ISPU event is from the algo00.
+    if(ispu_status.ia_ispu_0) {
+      //Get the tap event as uint8_t mapped starting from ISPU_DOUT_06_L and print it.
+      sensor.Read_ISPU_Output(LSM6DSO16IS_ISPU_DOUT_06_L,&data,1);
+      printTapStatus(data);
+    }
   }
 }
 
 void INT1Event_cb()
 {
-  tap_event = 1;
+  mems_event = 1;
 }
 
 void printTapStatus(uint8_t status)
