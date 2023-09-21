@@ -75,6 +75,12 @@ typedef struct {
 } LSM6DSO16IS_ISPU_Status_t;
 
 /* Defines -------------------------------------------------------------------*/
+/* For compatibility with ESP32 platforms */
+#ifdef ESP32
+  #ifndef MSBFIRST
+    #define MSBFIRST SPI_MSBFIRST
+  #endif
+#endif
 
 #define LSM6DSO16IS_I2C_BUS                 0U
 #define LSM6DSO16IS_SPI_4WIRES_BUS          1U
