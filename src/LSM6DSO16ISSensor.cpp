@@ -195,7 +195,6 @@ LSM6DSO16ISStatusTypeDef LSM6DSO16ISSensor::Enable_X(void)
 LSM6DSO16ISStatusTypeDef LSM6DSO16ISSensor::Disable_X(void)
 {
   LSM6DSO16ISStatusTypeDef ret = LSM6DSO16IS_STATUS_OK;
-  lsm6dso16is_xl_data_rate_t odr;
 
   /* Check if the component is already disabled */
   if (X_isEnabled == 0U) {
